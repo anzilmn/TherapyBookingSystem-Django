@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            
+            <a href="{% url 'therapist_list' %}" class="btn btn-link text-decoration-none text-muted mb-4 p-0">
+                <i class="bi bi-arrow-left"></i> Back to Experts
+            </a>
+
+            {# --- SECURITY CHECK: If user is the therapist --- #}
+            {% if user.id == therapist.id %}
+            <div class="card border-0 shadow-lg rounded-4 p-5 text-center" data-aos="zoom-in">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-octagon text-danger display-1"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Access Denied</h3>
+                <p class="text-muted">Vro, you cannot book a session with yourself. This page is for patients only.</p>
+                <a href="{% url 'therapist_dashboard' %}" class="btn btn-primary rounded-pill px-4 mt-3">
+                    Go to Your Dashboard
+                </a>
+            </div>
+
+            {% elif user.profile.role == 'therapist' %}
+            <div class="card border-0 shadow-lg rounded-4 p-5 text-center" data-aos="zoom-in">
+                <div class="mb-4">
+                    <i class="bi bi-shield-lock text-warning display-1"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Patient Only Page</h3>
+                <p class="text-muted">Therapist accounts are not authorized to book sessions. Please use a patient account.</p>
+                <a href="{% url 'therapist_list' %}" class="btn btn-outline-primary rounded-pill px-4 mt-3">
+                    Back to Experts
+                </a>
+            </div>
+
+            {% else %}
+            {# --- NORMAL BOOKING FORM FOR PATIENTS --- #}
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" data-aos="fade-down">
+                <div class="d-flex align-items-center p-4 bg-primary text-white">
+                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm" style="width: 60px; height: 60px;">
+                        {% if therapist.therapist_info.profile_picture %}
+                            <img src="{{ therapist.therapist_info.profile_picture.url }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center w-100 h-100 fw-bold">
+                                {{ therapist.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0 fw-bold">Dr. {{ therapist.first_name|default:therapist.username }}</h5>
+                        <p class="mb-0 small opacity-75">{{ therapist.therapist_info.specialization|default:"Mental Health Expert" }}</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold shadow-sm">
+                            {{ session_type|title }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 p-4 p-lg-5" data-aos="fade-up">
+                <h3 class="fw-bold mb-2">Schedule Session</h3>
+                <p class="text-muted small mb-4">Select your preferred date and time. Your therapist will review the request.</p>
+                
+                <form method="post" id="bookingForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase ls-1 text-primary">1. Choose Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" name="date" class="form-control bg-light border-0 py-3" required id="id_date">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase ls-1 text-primary">2. Select Time Slot</label>
+                        <div class="row g-2" id="slotGrid">
+                            {% for value, label in time_slots %}
+                            <div class="col-4 slot-item" data-slot-value="{{ value }}">
+                                <input type="radio" class="btn-check" name="time" id="time_{{ forloop.counter }}" value="{{ value }}" required>
+                                <label class="btn btn-outline-primary w-100 py-2 rounded-3 small fw-semibold" for="time_{{ forloop.counter }}">
+                                    {{ label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="pastSlotsNote" class="mt-2 text-muted small d-none">
+                            <i class="bi bi-lock-fill me-1"></i> Slots before current time are unavailable for today.
+                        </div>
+                    </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-3 mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0 text-muted small fw-bold text-uppercase">Total Cost</p>
+                                <h4 class="mb-0 fw-bold text-dark">₹{% if session_type == 'couple' %}5000{% else %}2000{% endif %}</h4>
+                            </div>
+                            <div class="text-end">
+                                <i class="bi bi-info-circle-fill text-primary" data-bs-toggle="tooltip" title="Standard rates apply"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-primary-subtle border-0 small d-flex align-items-center mb-4">
+                        <i class="bi bi-info-circle-fill me-2 fs-5 text-primary"></i>
+                        <span class="text-primary-emphasis">This session is secure and encrypted.</span>
+                    </div>
+
+                    <button type="button" onclick="handleBookingSubmit()" class="btn btn-primary btn-lg w-100 rounded-pill py-3 shadow-sm fw-bold transition-all">
+                        Confirm Booking Request
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            
+            <p class="text-center mt-4 text-muted small">
+                <i class="bi bi-shield-check text-success"></i> Secure & Private Booking
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const TODAY_STR = "{{ today_str }}";
+    const CURRENT_TIME_24 = "{{ current_time_24 }}"; // e.g. "13:05"
+
+    // Slot value to 24h map for comparison
+    const SLOT_TO_24 = {
+        "09:00 AM": "09:00",
+        "10:00 AM": "10:00",
+        "11:00 AM": "11:00",
+        "01:00 PM": "13:00",
+        "02:00 PM": "14:00",
+        "03:00 PM": "15:00",
+        "04:00 PM": "16:00",
+        "05:00 PM": "17:00",
+        "07:00 PM": "19:00",
+    };
+
+    function updateSlotAvailability(selectedDate) {
+        const slots = document.querySelectorAll('.slot-item');
+        const note = document.getElementById('pastSlotsNote');
+        let anyLocked = false;
+
+        slots.forEach(function(item) {
+            const slotVal = item.getAttribute('data-slot-value');
+            const slot24 = SLOT_TO_24[slotVal] || "99:99";
+            const radio = item.querySelector('input[type="radio"]');
+            const label = item.querySelector('label');
+
+            if (selectedDate === TODAY_STR && slot24 <= CURRENT_TIME_24) {
+                // Lock this slot
+                radio.disabled = true;
+                radio.checked = false;
+                label.classList.add('disabled', 'opacity-50', 'text-muted');
+                label.classList.remove('btn-outline-primary');
+                label.classList.add('btn-outline-secondary');
+                label.style.cursor = 'not-allowed';
+                label.title = 'This time has already passed';
+                anyLocked = true;
+            } else {
+                radio.disabled = false;
+                label.classList.remove('disabled', 'opacity-50', 'text-muted');
+                label.classList.remove('btn-outline-secondary');
+                label.classList.add('btn-outline-primary');
+                label.style.cursor = '';
+                label.title = '';
+            }
+        });
+
+        if (note) note.classList.toggle('d-none', !anyLocked);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('id_date');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+
+            // Check on load if today is pre-selected
+            if (dateInput.value) updateSlotAvailability(dateInput.value);
+
+            dateInput.addEventListener('change', function() {
+                updateSlotAvailability(this.value);
+            });
+        }
+    });
+
+    function handleBookingSubmit() {
+        const form = document.getElementById('bookingForm');
+        const date = document.getElementById('id_date').value;
+        const timeSelected = document.querySelector('input[name="time"]:checked');
+
+        if (!date || !timeSelected) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please select both a date and a time slot, vro!',
+                confirmButtonColor: '#0d6efd'
+            });
+            return;
+        }
+
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#0d6efd', '#6610f2', '#ffffff']
+        });
+
+        Swal.fire({
+            title: 'Request Sending!',
+            text: 'We are notifying Dr. {{ therapist.username }}...',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            willClose: () => {
+                form.submit();
+            }
+        });
+    }
+</script>
+
+<style>
+    body { background-color: #f8f9fa; }
+    .ls-1 { letter-spacing: 1px; font-size: 0.75rem; }
+    .transition-all { transition: all 0.3s ease; }
+    .transition-all:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); }
+    .btn-check:checked + .btn-outline-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #fff !important;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+    }
+    .btn-outline-primary {
+        border: 1px solid #dee2e6;
+        color: #495057;
+        background-color: #fff;
+    }
+    .btn-outline-primary:hover {
+        background-color: #f1f4ff;
+        color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .input-group-text { color: #0d6efd; }
+    .alert-primary-subtle { background-color: #e7f1ff; }
+</style>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="text-center mb-4">
+                    <div class="avatar-circle bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; font-size: 1.5rem;">
+                        {{ session.therapist.username|slice:":1"|upper }}
+                    </div>
+                    <h3 class="fw-bold">Reschedule Session</h3>
+                    <p class="text-muted">Adjusting your appointment with <strong>Dr. {{ session.therapist.username }}</strong></p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Select New Date</label>
+                        <input type="date" name="date" id="id_date" class="form-control form-control-lg rounded-3 border-light shadow-sm" 
+                               value="{{ session.date|date:'Y-m-d' }}" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Select New Time</label>
+                        <div class="row g-2" id="slotGrid">
+                            {% for value, label in time_slots %}
+                            <div class="col-6 slot-item" data-slot-value="{{ value }}">
+                                <input type="radio" class="btn-check" name="time" id="slot{{ forloop.counter }}" 
+                                       value="{{ value }}" {% if value == session.time_slot|time:"h:i A" %}checked{% endif %} required>
+                                <label class="btn btn-outline-primary w-100 rounded-3 py-2" for="slot{{ forloop.counter }}">
+                                    {{ label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="pastSlotsNote" class="mt-2 text-muted small d-none">
+                            <i class="bi bi-lock-fill me-1"></i> Slots before current time are unavailable for today.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">Update Appointment</button>
+                        <a href="{% url 'patient_dashboard' %}" class="btn btn-link text-muted text-decoration-none small">Keep current time</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const TODAY_STR = "{{ today_str }}";
+    const CURRENT_TIME_24 = "{{ current_time_24 }}";
+
+    const SLOT_TO_24 = {
+        "09:00 AM": "09:00",
+        "10:00 AM": "10:00",
+        "11:00 AM": "11:00",
+        "01:00 PM": "13:00",
+        "02:00 PM": "14:00",
+        "03:00 PM": "15:00",
+        "04:00 PM": "16:00",
+        "05:00 PM": "17:00",
+        "07:00 PM": "19:00",
+    };
+
+    function updateSlotAvailability(selectedDate) {
+        const slots = document.querySelectorAll('.slot-item');
+        const note = document.getElementById('pastSlotsNote');
+        let anyLocked = false;
+
+        slots.forEach(function(item) {
+            const slotVal = item.getAttribute('data-slot-value');
+            const slot24 = SLOT_TO_24[slotVal] || "99:99";
+            const radio = item.querySelector('input[type="radio"]');
+            const label = item.querySelector('label');
+
+            if (selectedDate === TODAY_STR && slot24 <= CURRENT_TIME_24) {
+                radio.disabled = true;
+                radio.checked = false;
+                label.classList.add('disabled', 'opacity-50', 'text-muted');
+                label.classList.remove('btn-outline-primary');
+                label.classList.add('btn-outline-secondary');
+                label.style.cursor = 'not-allowed';
+                label.title = 'This time has already passed';
+                anyLocked = true;
+            } else {
+                radio.disabled = false;
+                label.classList.remove('disabled', 'opacity-50', 'text-muted');
+                label.classList.remove('btn-outline-secondary');
+                label.classList.add('btn-outline-primary');
+                label.style.cursor = '';
+                label.title = '';
+            }
+        });
+
+        if (note) note.classList.toggle('d-none', !anyLocked);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('id_date');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+            if (dateInput.value) updateSlotAvailability(dateInput.value);
+            dateInput.addEventListener('change', function() {
+                updateSlotAvailability(this.value);
+            });
+        }
+    });
+</script>
+
+<style>
+    body { background-color: #f8f9fa; }
+    .btn-check:checked + .btn-outline-primary {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+    }
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+</style>
+{% endblock %}

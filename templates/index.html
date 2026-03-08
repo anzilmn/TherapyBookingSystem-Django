@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<style>
+    /* Premium Design System */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --primary-color: #4e73df;
+    }
+
+    body { overflow-x: hidden; background-color: #f8f9fc; }
+
+    /* Polished Hero */
+    .hero-section {
+        background: radial-gradient(circle at 80% 20%, #eef2f7 0%, #ffffff 100%);
+        padding: 140px 0 100px;
+        border-radius: 0 0 80px 80px;
+        position: relative;
+    }
+
+    .hero-floating-circle {
+        position: absolute;
+        background: linear-gradient(135deg, rgba(78, 115, 223, 0.08), rgba(34, 74, 190, 0.05));
+        border-radius: 50%;
+        z-index: 0;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-20px) scale(1.05); }
+    }
+
+    /* Category Icon Grid */
+    .category-box {
+        background: white;
+        padding: 20px;
+        border-radius: 24px;
+        border: 1px solid #edf2f7;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+    }
+    .category-box:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 20px rgba(78, 115, 223, 0.1);
+    }
+    .category-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        border: 1px solid #f1f4f9;
+        padding: 45px 30px;
+        border-radius: 32px;
+        background: #ffffff;
+        transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        height: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 30px 60px rgba(78, 115, 223, 0.15);
+        border-color: var(--primary-color);
+    }
+
+    .feature-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 22px;
+        margin-bottom: 25px;
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: white;
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+        transform: rotate(-10deg) scale(1.1);
+    }
+
+    /* Expert Cards */
+    .therapist-card {
+        border: none;
+        border-radius: 30px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .therapist-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+    }
+
+    .therapist-img-container {
+        height: 350px;
+        position: relative;
+    }
+
+    /* Stats Section */
+    .stat-box {
+        padding: 30px;
+        text-align: center;
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        display: block;
+    }
+
+    /* Glass Testimonials */
+    .testimonial-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+    }
+
+    .contact-card {
+        background: #ffffff;
+        border-radius: 40px;
+        border: 1px solid #f1f4f9;
+        box-shadow: 0 40px 80px rgba(0,0,0,0.07);
+    }
+
+    .ls-1 { letter-spacing: 1.5px; }
+</style>
+
+<div class="hero-section text-center shadow-sm">
+    <div class="hero-floating-circle" style="width: 400px; height: 400px; top: -100px; right: -100px;"></div>
+    <div class="hero-floating-circle" style="width: 200px; height: 200px; bottom: 50px; left: -50px; animation-delay: 2s;"></div>
+    
+    <div class="container position-relative" style="z-index: 1;">
+        <span class="badge bg-primary-subtle text-primary px-4 py-2 rounded-pill mb-4" data-aos="fade-down">
+            <i class="bi bi-stars me-2"></i>THE FUTURE OF MENTAL HEALTH
+        </span>
+        <h1 class="display-2 fw-bold text-dark mb-4" data-aos="zoom-in" data-aos-delay="100">
+            Your Journey to <span class="text-primary">Clarity</span> <br>Starts Here.
+        </h1>
+        <p class="lead text-muted mb-5 mx-auto" style="max-width: 700px;" data-aos="fade-up" data-aos-delay="200">
+            Skip the waiting rooms. Connect with elite, verified mental health professionals through our encrypted high-end therapy suite.
+        </p>
+
+       <div class="row g-3 justify-content-center mb-5" data-aos="fade-up" data-aos-delay="300">
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-chat-heart category-icon"></i>
+            <span class="small fw-bold">Therapy</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-heart-pulse category-icon"></i>
+            <span class="small fw-bold">Depression</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-people category-icon"></i>
+            <span class="small fw-bold">Couples</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-mortarboard category-icon"></i>
+            <span class="small fw-bold">Stress</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-shield-exclamation category-icon"></i>
+            <span class="small fw-bold">Trauma</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-moon-stars category-icon"></i>
+            <span class="small fw-bold">Sleep</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-cloud-rain category-icon"></i>
+            <span class="small fw-bold">Grief</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-lightning-charge category-icon"></i>
+            <span class="small fw-bold">ADHD</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-arrow-left-right category-icon"></i>
+            <span class="small fw-bold">Bipolar</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-rainbow category-icon"></i>
+            <span class="small fw-bold">LGBTQ+</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-person-check category-icon"></i>
+            <span class="small fw-bold">Confidence</span>
+        </div>
+    </div>
+    <div class="col-4 col-md-2">
+        <div class="category-box">
+            <i class="bi bi-briefcase category-icon"></i>
+            <span class="small fw-bold">Work-Life</span>
+        </div>
+    </div>
+</div>
+
+        <div class="d-flex justify-content-center gap-3" data-aos="fade-up" data-aos-delay="400">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold">Start Free Trial</a>
+            {% else %}
+                <a href="{% url 'dashboard_redirect' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold">Open Dashboard</a>
+            {% endif %}
+            <a href="#how-it-works" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill fw-bold">How it Works</a>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -50px; position: relative; z-index: 10;">
+    <div class="row g-0 bg-white shadow-lg rounded-4 overflow-hidden border" data-aos="fade-up" data-aos-delay="500">
+        <div class="col-md-4 stat-box border-end text-center p-4">
+            <span class="stat-number d-block">{{ total_patients|default:"0" }}+</span>
+            <span class="text-muted small fw-bold text-uppercase">Happy Patients</span>
+        </div>
+        <div class="col-md-4 stat-box border-end text-center p-4">
+            <span class="stat-number d-block">{{ total_therapists|default:"0" }}+</span>
+            <span class="text-muted small fw-bold text-uppercase">Verified Experts</span>
+        </div>
+        <div class="col-md-4 stat-box text-center p-4">
+            <span class="stat-number d-block">24/7</span>
+            <span class="text-muted small fw-bold text-uppercase">Secure Access</span>
+        </div>
+    </div>
+</div>
+
+<div id="how-it-works" class="container py-5 mt-5">
+    <div class="text-center mb-5" data-aos="fade-up">
+        <h6 class="text-primary fw-bold text-uppercase ls-1">The Process</h6>
+        <h2 class="display-5 fw-bold">Simple. Secure. Supportive.</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="bi bi-ui-checks fs-2"></i>
+                </div>
+                <h4 class="fw-bold">1. Personalized Match</h4>
+                <p class="text-muted">Our algorithm matches you with a specialist who understands your unique cultural and emotional background.</p>
+            </div>
+        </div>
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="bi bi-shield-check fs-2"></i>
+                </div>
+                <h4 class="fw-bold">2. Encrypted Space</h4>
+                <p class="text-muted">All sessions happen inside our military-grade encrypted portal. Your privacy is our absolute priority.</p>
+            </div>
+        </div>
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="bi bi-heart-pulse fs-2"></i>
+                </div>
+                <h4 class="fw-bold">3. Continuous Care</h4>
+                <p class="text-muted">Access resources, mood trackers, and chat support even between your scheduled sessions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-light-subtle py-5 mt-5">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-end mb-5" data-aos="fade-right">
+            <div>
+                <h6 class="text-primary fw-bold text-uppercase ls-1">Elite Medical Team</h6>
+                <h2 class="display-6 fw-bold">Meet our Featured Experts</h2>
+            </div>
+            <a href="{% url 'therapist_list' %}" class="btn btn-link text-primary fw-bold text-decoration-none">
+                View All Doctors <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% for t in therapists %}
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00">
+                <div class="therapist-card h-100">
+                    <div class="therapist-img-container">
+                        {% if t.user.profile.profile_pic %}
+                            <img src="{{ t.user.profile.profile_pic.url }}" class="w-100 h-100 object-fit-cover" alt="Dr. {{ t.user.username }}">
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-secondary">
+                                <i class="bi bi-person-fill display-1 opacity-25"></i>
+                            </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-white text-primary rounded-pill px-3 py-2 shadow-sm fw-bold">
+                                <i class="bi bi-star-fill me-1 text-warning"></i> 
+                                {{ t.average_rating|default:"4.9" }} </span>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-1">Dr. {{ t.user.first_name|default:t.user.username }}</h4>
+                        <p class="text-primary mb-3 fw-semibold small text-uppercase">
+                            <i class="bi bi-patch-check-fill me-1"></i>{{ t.specialization }}
+                        </p>
+                        
+                        {% if user.is_authenticated %}
+                            {% if user.id == t.user.id %}
+                                <span class="btn btn-light w-100 rounded-pill disabled">Your Profile</span>
+                            {% else %}
+                               <a href="{% url 'choose_session_type' t.user.id %}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">Book Session</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">Login to Book</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<section class="py-5 overflow-hidden">
+    <div class="container py-5">
+        <h2 class="text-center fw-bold display-5 mb-5" data-aos="fade-up">Trusted Stories</h2>
+        <div class="row g-4">
+            {% for r in reviews %}
+            <div class="col-md-4" data-aos="fade-left" data-aos-delay="{{ forloop.counter }}00">
+                <div class="testimonial-card h-100">
+                    <div class="text-warning mb-3 fs-5">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= r.rating %}
+                                <i class="bi bi-star-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="text-dark-emphasis mb-4 fs-5 fw-medium">"{{ r.comment }}"</p>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 50px; height: 50px; font-weight: bold;">
+                            {{ r.session.patient.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">{{ r.session.patient.username }}</h6>
+                            <small class="text-muted">Verified Patient</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted py-4">
+                <p>Healing stories are being written every day. Start yours today.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="container py-5 mb-5">
+    <div class="contact-card p-5" data-aos="fade-up">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <h2 class="display-5 fw-bold mb-4">Let's talk about <br><span class="text-primary">your wellness.</span></h2>
+                <p class="text-muted mb-5">Whether you have technical questions or need help finding a therapist, our concierge team is online.</p>
+                <div class="d-flex gap-4">
+                    <div class="text-center">
+                        <div class="feature-icon-wrapper mx-auto mb-2" style="width: 50px; height: 50px;">
+                            <i class="bi bi-chat-dots fs-5"></i>
+                        </div>
+                        <span class="small fw-bold">Live Chat</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="feature-icon-wrapper mx-auto mb-2" style="width: 50px; height: 50px; background: #333;">
+                            <i class="bi bi-telephone fs-5"></i>
+                        </div>
+                        <span class="small fw-bold">Callback</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <form action="{% url 'index' %}" method="POST" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-md-6">
+                        <input type="text" name="name" class="form-control border-0 bg-light p-3 rounded-3" placeholder="Full Name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="email" name="email" class="form-control border-0 bg-light p-3 rounded-3" placeholder="Email" required>
+                    </div>
+                    <div class="col-12">
+                        <textarea name="message" class="form-control border-0 bg-light p-3 rounded-3" rows="4" placeholder="How can we help?" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill py-3 fw-bold shadow">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 1000, once: true, offset: 100 });
+</script>
+
+{% endblock %}

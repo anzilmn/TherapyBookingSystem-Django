@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TherapySystem | Premium Mental Healthcare</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --text-dark: #2e3b4e;
+            --accent-green: #198754;
+            --danger-red: #dc3545;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfdfe;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- SOS PULSE ANIMATION --- */
+        .sos-btn {
+            background-color: var(--danger-red);
+            color: white !important;
+            font-weight: 700;
+            border: none;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            animation: sos-pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .sos-btn:hover {
+            background-color: #bb2d3b;
+            transform: scale(1.05);
+        }
+
+        @keyframes sos-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #555 !important;
+            padding: 0.5rem 1rem !important;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .btn-auth {
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+
+        .notification-badge {
+            font-size: 0.65rem;
+            padding: 0.35em 0.55em;
+            transform: translate(-5px, -10px);
+        }
+
+        .content-wrapper {
+            flex: 1;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .premium-footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 80px 0 40px;
+            margin-top: auto;
+            border-radius: 60px 60px 0 0;
+        }
+        .footer-brand { color: white; font-weight: 800; font-size: 1.5rem; text-decoration: none; }
+        .footer-link { color: #94a3b8; text-decoration: none; display: block; margin-bottom: 10px; transition: 0.2s; }
+        .footer-link:hover { color: var(--primary-color); transform: translateX(5px); }
+        .social-icon { 
+            width: 40px; height: 40px; background: rgba(255,255,255,0.08); 
+            display: inline-flex; align-items: center; justify-content: center; 
+            border-radius: 12px; color: white; margin-right: 10px; transition: 0.3s;
+        }
+        .social-icon:hover { background: var(--primary-color); transform: translateY(-3px); }
+        .newsletter-input { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav { padding: 1rem 0; }
+            .btn-auth { width: 100%; margin-top: 0.5rem; }
+            .sos-btn { margin-bottom: 1rem; width: 100%; justify-content: center; }
+        }
+
+        .toast-container { z-index: 2050; }
+        .toast {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                <i class="bi bi-heart-pulse-fill me-2 text-primary"></i> TherapySystem
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'therapist_list' %}">Find Experts</a></li>
+                    
+                    <li class="nav-item ms-lg-3">
+                        <a href="{% url 'emergency_support' %}" class="btn sos-btn rounded-pill shadow-sm">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> SOS HELP
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        {% if user.profile.role == 'patient' %}
+                        <li class="nav-item ms-lg-2">
+                         
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link fw-bold text-primary position-relative d-inline-flex align-items-center" href="{% url 'dashboard_redirect' %}">
+                                <i class="bi bi-grid-fill me-1"></i> Dashboard
+                                {% if total_unread > 0 %}
+                                <span class="badge rounded-pill bg-danger notification-badge">{{ total_unread }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        
+                        <!-- 🔔 NOTIFICATION BELL -->
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link position-relative d-inline-flex align-items-center" href="{% url 'notification_list' %}" title="Notifications">
+                                <i class="bi bi-bell-fill fs-5 text-dark"></i>
+                                {% if notif_unread_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                      style="font-size: 0.6rem; padding: 0.3em 0.5em;"
+                                      id="notif-badge">
+                                    {{ notif_unread_count }}
+                                </span>
+                                {% else %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                                      style="font-size: 0.6rem; padding: 0.3em 0.5em;"
+                                      id="notif-badge">0</span>
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        <li class="nav-item ms-lg-3 d-flex align-items-center">
+                            <span class="navbar-text me-3 small d-none d-lg-inline text-dark">
+                                <i class="bi bi-person-circle"></i> <strong>{{ user.username }}</strong>
+                            </span>
+                            <form action="{% url 'logout' %}" method="post" class="d-inline m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-auth btn-sm">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-lg-2"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-primary btn-auth shadow-sm" href="{% url 'signup' %}">Join Now</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="content-wrapper container py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast align-items-center text-white {% if message.tags == 'error' %}bg-danger{% elif message.tags == 'success' %}bg-success{% else %}bg-primary{% endif %} border-0 mb-2 shadow-lg" role="alert">
+                <div class="d-flex p-2">
+                    <div class="toast-body fw-medium d-flex align-items-center">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <a href="#" class="footer-brand mb-3 d-block">TherapySys</a>
+                    <p class="small mb-4">Your journey to a better mind starts here. Safe, encrypted, and compassionate care.</p>
+                    <div class="d-flex">
+                        <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Platform</h6>
+                    <a href="{% url 'therapist_list' %}" class="footer-link small">Find Experts</a>
+                    <a href="#" class="footer-link small">How it Works</a>
+                    <a href="#" class="footer-link">Pricing</a>
+                    <a href="{% url 'emergency_support' %}" class="footer-link text-danger fw-bold">Emergency Support</a>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Support</h6>
+                    <a href="#" class="footer-link small">Privacy Policy</a>
+                    <a href="#" class="footer-link small">Terms</a>
+                    <a href="#" class="footer-link">Cookie Policy</a>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="text-white fw-bold mb-3">Newsletter</h6>
+                    <p class="small mb-4">Tips for mental wellbeing delivered to your inbox.</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control newsletter-input rounded-start-pill py-2 ps-3" placeholder="email@example.com">
+                        <button class="btn btn-primary rounded-end">Join</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-5 border-secondary opacity-25">
+            <div class="text-center small opacity-50">
+                &copy; 2025 TherapySystem Healthcare. Built with ❤️ for healthy minds.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function (toastEl) {
+                var toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 4000 });
+                toast.show();
+                return toast;
+            });
+        });
+    </script>
+
+    {% if user.is_authenticated %}
+    <!-- 🔔 Live notification badge polling (every 30 seconds) -->
+    <script>
+    (function() {
+        function updateNotifBadge() {
+            fetch("{% url 'notif_unread_count' %}", { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('notif-badge');
+                    if (!badge) return;
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.classList.remove('d-none');
+                    } else {
+                        badge.classList.add('d-none');
+                    }
+                })
+                .catch(() => {}); // silently fail
+        }
+        // Poll every 30 seconds
+        setInterval(updateNotifBadge, 30000);
+    })();
+    </script>
+    {% endif %}
+</body>
+</html>

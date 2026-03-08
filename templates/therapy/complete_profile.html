@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="text-center mb-5">
+                <div class="feature-icon-wrapper mx-auto mb-3" style="width: 70px; height: 70px; background: #198754; color: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h2 class="fw-bold">Professional Verification</h2>
+                <p class="text-muted">Complete your profile to join our network of licensed therapists.</p>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-4 bg-success text-white p-4 p-lg-5 d-flex flex-column justify-content-center">
+                        <h5 class="fw-bold mb-4">Why verify?</h5>
+                        <ul class="list-unstyled small">
+                            <li class="mb-3 d-flex align-items-top">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Get a "Verified" badge on your profile.</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-top">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Reach more patients in need.</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-top">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Access secure messaging tools.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-8 bg-white p-4 p-lg-5">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-12 mb-4">
+                                    <label class="form-label fw-bold small text-uppercase ls-1">Profile Photo</label>
+                                    <div class="d-flex align-items-center gap-3 p-3 border rounded-3 bg-light">
+                                        <div id="image-preview" class="bg-secondary rounded-circle d-flex align-items-center justify-content-center border shadow-sm" style="width: 80px; height: 80px; overflow: hidden; flex-shrink: 0;">
+                                            <i class="bi bi-person-fill text-white fs-1"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="upload-box border rounded-3 p-2 text-center position-relative bg-white shadow-sm">
+                                                <i class="bi bi-camera-fill text-success"></i>
+                                                <p class="mb-0 small text-muted">Upload Professional Headshot</p>
+                                                <input type="file" name="profile_pic" id="profile-pic-input" class="form-control position-absolute top-0 start-0 opacity-0 h-100" style="cursor: pointer;" accept="image/*" required>
+                                            </div>
+                                            <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">JPG or PNG recommended.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 mb-4">
+                                    <label class="form-label fw-bold small text-uppercase ls-1">Professional Qualification</label>
+                                    <input type="text" name="qualification" class="form-control bg-light border-0 py-3" placeholder="e.g. M.Sc. in Clinical Psychology" required>
+                                </div>
+
+                                <div class="col-md-8 mb-4">
+                                    <label class="form-label fw-bold small text-uppercase ls-1">Main Specialization</label>
+                                    <input type="text" name="specialization" class="form-control bg-light border-0 py-3" placeholder="e.g. Anxiety, Depression, CBT" required>
+                                </div>
+
+                                <div class="col-md-4 mb-4">
+                                    <label class="form-label fw-bold small text-uppercase ls-1">Exp (Years)</label>
+                                    <input type="number" name="experience" class="form-control bg-light border-0 py-3" required>
+                                </div>
+
+                                <div class="col-md-12 mb-4">
+                                    <label class="form-label fw-bold small text-uppercase ls-1">Professional Certificate</label>
+                                    <div class="upload-box border rounded-3 p-3 text-center position-relative bg-light">
+                                        <i class="bi bi-cloud-arrow-up fs-3 text-success"></i>
+                                        <p class="mb-0 small text-muted">Click to upload your license (PDF/JPG)</p>
+                                        <input type="file" name="certificate" class="form-control position-absolute top-0 start-0 opacity-0 h-100" style="cursor: pointer;" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 mb-4">
+                                    <label class="form-label fw-bold small text-uppercase ls-1">About You (Bio)</label>
+                                    <textarea name="bio" class="form-control bg-light border-0 py-3" rows="4" placeholder="Briefly describe your approach to therapy..."></textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold shadow-sm">
+                                        Submit Profile for Review
+                                    </button>
+                                    <p class="text-center text-muted small mt-3">
+                                        <i class="bi bi-info-circle"></i> Verification usually takes 24-48 hours.
+                                    </p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 0.5px; }
+    .upload-box:hover {
+        background-color: #f8f9fa !important;
+        border-color: #198754 !important;
+    }
+    .form-control:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.1);
+    }
+    #image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+
+<script>
+    document.getElementById('profile-pic-input').onchange = evt => {
+        const [file] = document.getElementById('profile-pic-input').files
+        if (file) {
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = `<img src="${URL.createObjectURL(file)}">`;
+        }
+    }
+</script>
+{% endblock %}

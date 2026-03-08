@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light-subtle">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">Our Medical Team</span>
+            <h1 class="display-5 fw-bold">Meet Our <span class="text-primary">Experts</span></h1>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Browse through our verified clinical psychologists and find the right match for your journey to mental wellness.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            {% for t in therapists %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 expert-card">
+                    <div class="position-relative">
+                        {% if t.user.profile.profile_pic %}
+                            <img src="{{ t.user.profile.profile_pic.url }}" class="card-img-top" style="height: 280px; object-fit: cover;" alt="Dr. {{ t.user.username }}">
+                        {% else %}
+                            <div class="bg-primary-subtle d-flex align-items-center justify-content-center" style="height: 280px;">
+                                <i class="bi bi-person-fill text-primary" style="font-size: 5rem;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2">
+                                <i class="bi bi-patch-check-fill text-primary me-1"></i> Verified
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <h4 class="fw-bold mb-1">Dr. {{ t.user.username }}</h4>
+                            <span class="text-primary fw-semibold small text-uppercase ls-1">{{ t.specialization }}</span>
+                        </div>
+                        
+                        <p class="text-muted small mb-4">
+                            {{ t.bio|truncatewords:25 }}
+                        </p>
+
+                        <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                            <div class="text-start">
+                                <small class="text-muted d-block">Experience</small>
+                                <span class="fw-bold text-dark">{{ t.experience_years }} Years</span>
+                            </div>
+
+                            {# --- BLOCK SELF-BOOKING UI --- #}
+                            {% if user.is_authenticated %}
+                                {% if user.id == t.user.id %}
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+                                        <i class="bi bi-person-circle me-1"></i> This is You
+                                    </span>
+                                {% elif user.profile.role == 'therapist' %}
+                                    <span class="text-muted small italic">Therapist Account</span>
+                                {% else %}
+                                    <a href="{% url 'choose_session_type' t.user.id %}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">Book Session</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill px-4">
+                                    Login to Book
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="bg-white p-5 rounded-4 shadow-sm d-inline-block">
+                    <i class="bi bi-search display-1 text-muted opacity-25"></i>
+                    <h3 class="mt-4 fw-bold">No Experts Found</h3>
+                    <p class="text-muted">We are currently onboarding new therapists. Please check back later.</p>
+                    <a href="{% url 'index' %}" class="btn btn-outline-primary rounded-pill px-4 mt-3">Go Back Home</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .expert-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .expert-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+    }
+    .ls-1 { letter-spacing: 0.5px; }
+</style>
+{% endblock %}

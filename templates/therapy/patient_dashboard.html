@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-5 bg-white p-4 rounded-4 shadow-sm border-start border-primary border-5">
+        <div>
+            <h2 class="fw-bold mb-1">Welcome back, {{ user.username }}! 👋</h2>
+            <p class="text-muted mb-0">Manage your mental wellness and upcoming sessions.</p>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold">
+                <i class="bi bi-person-badge me-1"></i> Patient Account
+            </span>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="background: linear-gradient(45deg, #4e73df, #224abe);">
+                <div class="card-body p-4 text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <i class="bi bi-pencil-square fs-1"></i>
+                        <span class="badge bg-white text-primary rounded-pill px-3 shadow-sm">Private</span>
+                    </div>
+                    <h5 class="fw-bold">My Private Journal</h5>
+                    <p class="small opacity-75 mb-4">Record your thoughts and track your mood trends safely.</p>
+                    <a href="{% url 'journal' %}" class="btn btn-light btn-sm rounded-pill px-4 fw-bold">
+                        Open Journal
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-graph-up text-primary me-2"></i>Mood Progress (Weekly)</h5>
+                        <small class="text-muted">Last 7 Days</small>
+                    </div>
+                    <div style="height: 180px; position: relative;">
+                        <canvas id="moodChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold"><i class="bi bi-search me-2"></i>Find a Specialist</h4>
+        <div class="dropdown">
+            <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm border dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Filter Specialization
+            </button>
+            <ul class="dropdown-menu border-0 shadow">
+                <li><a class="dropdown-item" href="#">All</a></li>
+                <li><a class="dropdown-item" href="#">Anxiety</a></li>
+                <li><a class="dropdown-item" href="#">Depression</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        {% for t in therapists %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm transition-card rounded-4 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar-circle bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            {{ t.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h5 class="card-title fw-bold mb-0">Dr. {{ t.user.username }}</h5>
+                            <small class="text-primary fw-medium">{{ t.specialization }}</small>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted small mb-4" style="height: 4.5em; overflow: hidden;">
+                        {{ t.bio|truncatewords:20 }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <span class="small text-muted"><i class="bi bi-briefcase me-1"></i> {{ t.experience_years }}y Exp.</span>
+                        <a href="{% url 'choose_session_type' t.user.id %}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">Book Session</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-people text-muted display-1 opacity-25"></i>
+            <p class="text-muted mt-3">No verified therapists are available in your region yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h4 class="fw-bold mb-4"><i class="bi bi-calendar-event me-2"></i>My Appointment History</h4>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+    <thead class="bg-light text-muted small text-uppercase">
+        <tr>
+            <th class="ps-4 py-3 border-0">Therapist</th>
+            <th class="py-3 border-0">Type</th> <th class="py-3 border-0">Schedule</th>
+            <th class="py-3 border-0">Amount</th> 
+            <th class="py-3 border-0">Last Message</th> 
+            <th class="py-3 border-0 text-center">Status</th>
+            <th class="text-end pe-4 py-3 border-0">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in sessions %}
+        <tr>
+            <td class="ps-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-primary-subtle p-2 me-3 text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-semibold">Dr. {{ s.therapist.username }}</h6>
+                        <small class="text-muted">ID: #{{ s.id }}</small>
+                    </div>
+                </div>
+            </td>
+            <td>
+                {% if s.session_type == 'couple' %}
+                    <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-2 text-capitalize">{{ s.session_type }}</span>
+                {% else %}
+                    <span class="badge rounded-pill bg-light text-primary border px-2 text-capitalize">{{ s.session_type }}</span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="small fw-medium text-dark">{{ s.date }}</div>
+                <div class="text-muted small">{{ s.time_slot_label }}</div>
+            </td>
+            <td>
+                <div class="fw-bold text-dark">₹{{ s.amount|floatformat:0 }}</div>
+            </td>
+            <td>
+                {% if s.last_message %}
+                    <div class="small text-muted text-truncate" style="max-width: 180px;">
+                        {% if s.last_message.sender == request.user %}
+                            <span class="fw-bold text-primary">You:</span>
+                        {% endif %}
+                        {{ s.last_message.content }}
+                    </div>
+                    <div class="very-small text-muted" style="font-size: 0.7rem;">{{ s.last_message.timestamp|timesince }} ago</div>
+                {% else %}
+                    <span class="text-muted small italic opacity-50">No messages</span>
+                {% endif %}
+            </td>
+            <td class="text-center">
+                {% if s.status == 'pending' %}
+                    <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">Pending Approval</span>
+                {% elif s.status == 'approved' and not s.is_paid %}
+                    <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">Waiting for Payment</span>
+                {% elif s.status == 'approved' and s.is_paid %}
+                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2 animate-pulse">Active ✅</span>
+                {% elif s.status == 'completed' %}
+                    <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">Completed</span>
+                {% else %}
+                    <span class="badge rounded-pill bg-light text-muted px-3 py-2">Cancelled</span>
+                {% endif %}
+            </td>
+            <td class="text-end pe-4">
+                {% if s.status == 'approved' %}
+                    {% if not s.is_paid %}
+                        <a href="{% url 'initiate_payment' s.id %}" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm">
+                            <i class="bi bi-credit-card me-1"></i> Pay Now
+                        </a>
+                    {% else %}
+                      <div class="btn-group shadow-sm rounded-pill" style="position: relative; right: 20px; overflow: visible;">
+                        {% if s.can_join %}
+                          <a href="{% url 'video_call' s.id %}" class="btn btn-primary btn-sm px-3 fw-bold rounded-start-pill">
+                              <i class="bi bi-camera-video me-1"></i> Join
+                          </a>
+                        {% else %}
+                          <!-- 🔒 Time-locked: session not in IST window yet -->
+                          <button class="btn btn-secondary btn-sm px-3 fw-bold rounded-start-pill"
+                                  disabled
+                                  title="Join opens at {{ s.time_slot_label }} IST on {{ s.date }}. Available 15 min before.">
+                              <i class="bi bi-lock-fill me-1"></i> {{ s.time_slot_label }}
+                          </button>
+                        {% endif %}
+                        {% if s.can_chat %}
+                        <a href="{% url 'chat_room' s.id %}" class="btn btn-outline-primary btn-sm px-3 rounded-end-pill position-relative border-start-0">
+                            <i class="bi bi-chat-dots"></i>
+                            {% if s.unread_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger border border-light" style="font-size: 0.6rem; z-index: 2; margin-left: -5px;">
+                                    {{ s.unread_count }}
+                                </span>
+                            {% endif %}
+                        </a>
+                        {% else %}
+                        <button class="btn btn-outline-secondary btn-sm px-3 rounded-end-pill border-start-0"
+                                disabled title="Chat unlocks at session time">
+                            <i class="bi bi-lock-fill"></i>
+                        </button>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                {% elif s.status == 'pending' %}
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3">
+                            <li>
+                                <a class="dropdown-item small py-2" href="{% url 'edit_session' s.id %}">
+                                    <i class="bi bi-pencil-square me-2 text-primary"></i>Reschedule
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider opacity-50"></li>
+                            <li>
+                                <form action="{% url 'delete_session' s.id %}" method="post" onsubmit="return confirm('Are you sure you want to cancel this request?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item small py-2 text-danger">
+                                        <i class="bi bi-trash3 me-2"></i>Cancel Request
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                {% elif s.status == 'completed' %}
+                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                        {% if s.prescription %}
+                            <a href="{% url 'view_prescription' s.id %}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">
+                                <i class="bi bi-file-earmark-medical me-1"></i> View Prescription
+                            </a>
+                        {% endif %}
+                        {% if not s.review %}
+                            <a href="{% url 'give_feedback' s.id %}" class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm fw-bold">
+                                <i class="bi bi-star me-1"></i> Rate
+                            </a>
+                        {% endif %}
+                        {% if not s.complaint %}
+                            <a href="{% url 'file_complaint' s.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold"
+                               title="File a complaint about this session">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Complaint
+                            </a>
+                        {% else %}
+                            <span class="btn btn-sm rounded-pill px-3 fw-bold btn-light text-muted border" title="Complaint already filed">
+                                <i class="bi bi-check-circle me-1 text-success"></i> Complaint Filed
+                            </span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <button class="btn btn-light btn-sm rounded-circle shadow-sm disabled">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center py-5"> <img src="https://cdn-icons-png.flaticon.com/512/4076/4076402.png" style="width: 80px; opacity: 0.5;" alt="Empty Box">
+                <p class="text-muted mt-3">Your appointment list is empty. Reach out to a therapist to begin.</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('moodChart').getContext('2d');
+        
+        const labels = {{ chart_labels|safe|default:"[]" }};
+        const moodData = {{ chart_data|safe|default:"[]" }};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Mood Level',
+                    data: moodData,
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#4e73df',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const emojis = ['', '😭', '😔', '😐', '🙂', '😊'];
+                                return ' Mood: ' + (emojis[context.parsed.y] || context.parsed.y);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                const emojis = ['', '😭', '😔', '😐', '🙂', '😊'];
+                                return emojis[value] || value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .transition-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .transition-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
+    
+    .animate-pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    
+    .bg-success-subtle { background-color: #d1e7dd !important; color: #0f5132 !important; }
+    .bg-warning-subtle { background-color: #fff3cd !important; color: #664d03 !important; }
+    .bg-primary-subtle { background-color: #cfe2ff !important; color: #084298 !important; }
+    .bg-danger-subtle { background-color: #f8d7da !important; color: #842029 !important; }
+    
+    .very-small { font-size: 0.75rem; }
+    .table-hover tbody tr:hover { background-color: #f8faff; transition: 0.2s; }
+</style>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - MindCare{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-0"><i class="bi bi-bell-fill text-primary me-2"></i>Notifications</h3>
+      <p class="text-muted small mb-0">Stay updated on your sessions and activity.</p>
+    </div>
+    {% if notifications %}
+    <form method="post" action="{% url 'mark_all_notif_read' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+        <i class="bi bi-check2-all me-1"></i> Mark All Read
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+  <!-- Notifications List -->
+  {% if notifications %}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      {% for notif in notifications %}
+      <div class="d-flex align-items-start p-3 border-bottom {% if not notif.is_read %}bg-primary bg-opacity-10{% endif %} position-relative notification-item"
+           id="notif-{{ notif.id }}">
+        <!-- Icon -->
+        <div class="flex-shrink-0 me-3">
+          <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center"
+               style="width: 44px; height: 44px; border: 2px solid #e2e8f0;">
+            <i class="bi {{ notif.icon }} fs-5"></i>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="mb-0 fw-semibold {% if not notif.is_read %}text-dark{% else %}text-secondary{% endif %}">
+                {{ notif.title }}
+                {% if not notif.is_read %}
+                  <span class="badge bg-primary ms-1 rounded-pill" style="font-size: 0.6rem;">NEW</span>
+                {% endif %}
+              </p>
+              <p class="mb-1 small text-muted">{{ notif.message }}</p>
+              <p class="mb-0 text-muted" style="font-size: 0.75rem;">
+                <i class="bi bi-clock me-1"></i>
+                {{ notif.created_at|timesince }} ago
+              </p>
+            </div>
+            <!-- Actions -->
+            <div class="d-flex gap-2 ms-3 flex-shrink-0">
+              {% if notif.link %}
+              <a href="{{ notif.link }}" class="btn btn-sm btn-outline-primary rounded-pill px-2"
+                 style="font-size: 0.75rem;">
+                View
+              </a>
+              {% endif %}
+              <button class="btn btn-sm btn-outline-danger rounded-circle p-1 delete-notif-btn"
+                      data-notif-id="{{ notif.id }}"
+                      data-url="{% url 'delete_notification' notif.id %}"
+                      title="Delete"
+                      style="width: 30px; height: 30px;">
+                <i class="bi bi-x" style="font-size: 0.8rem;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+      <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3"
+           style="width: 80px; height: 80px;">
+        <i class="bi bi-bell-slash text-muted fs-2"></i>
+      </div>
+      <h5 class="fw-semibold text-dark mb-1">All caught up!</h5>
+      <p class="text-muted small">No notifications yet. We'll let you know when something happens.</p>
+      <a href="{% url 'dashboard_redirect' %}" class="btn btn-primary rounded-pill px-4 mt-2">
+        <i class="bi bi-house me-1"></i> Back to Dashboard
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+// CSRF helper
+function getCookie(name) {
+  let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+  return v ? v[2] : null;
+}
+
+// Delete individual notification
+document.querySelectorAll('.delete-notif-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const notifId = this.dataset.notifId;
+    const url = this.dataset.url;
+    const row = document.getElementById('notif-' + notifId);
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        row.style.transition = 'opacity 0.3s';
+        row.style.opacity = '0';
+        setTimeout(() => row.remove(), 300);
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

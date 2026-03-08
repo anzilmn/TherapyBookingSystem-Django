@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Choose Session Type</h2>
+        <p class="text-muted">Select how you would like to consult with Dr. {{ therapist.user.username }}</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-card">
+                <div class="py-4">
+                    <i class="bi bi-person-fill text-primary display-3"></i>
+                </div>
+                <h4 class="fw-bold">Single Session</h4>
+                <p class="text-muted small">One-on-one private consultation for personal growth and healing.</p>
+                <a href="{% url 'book_session' therapist.user.id %}?type=single" class="btn btn-outline-primary rounded-pill px-4 mt-3">Select Single</a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-card">
+                <div class="py-4">
+                    <i class="bi bi-people-fill text-danger display-3"></i>
+                </div>
+                <h4 class="fw-bold">Couple Session</h4>
+                <p class="text-muted small">Joint session for partners to work through relationship challenges together.</p>
+                <a href="{% url 'book_session' therapist.user.id %}?type=couple" class="btn btn-outline-danger rounded-pill px-4 mt-3">Select Couple</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-card { transition: all 0.3s ease; border: 2px solid transparent !important; }
+    .transition-card:hover { transform: translateY(-10px); border-color: #4e73df !important; shadow: 0 1rem 3rem rgba(0,0,0,.175)!important; }
+</style>
+{% endblock %}

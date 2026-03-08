@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <!-- Header -->
+                <div class="card-header border-0 py-4 px-4" style="background: linear-gradient(135deg, #dc3545 0%, #c0392b 100%);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                            <i class="bi bi-exclamation-triangle-fill text-white fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold text-white">File a Complaint</h5>
+                            <small class="text-white opacity-75">Session with Dr. {{ session.therapist.last_name|default:session.therapist.username }} · {{ session.date }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body px-4 py-4">
+
+                    {% if messages %}
+                        {% for msg in messages %}
+                        <div class="alert alert-{{ msg.tags }} rounded-3 small py-2">{{ msg }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <p class="text-muted small mb-4">
+                        Your complaint will be reviewed by our admin team. If found valid, action will be taken against the therapist.
+                    </p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-uppercase text-muted ls-1">Subject <span class="text-danger">*</span></label>
+                            <input type="text" name="subject" class="form-control rounded-3 border-light-subtle"
+                                   placeholder="e.g. Unprofessional behaviour, No-show, etc."
+                                   maxlength="200" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small text-uppercase text-muted ls-1">Describe the Issue <span class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control rounded-3 border-light-subtle" rows="5"
+                                      placeholder="Please describe in detail what happened during or after the session. Minimum 20 characters."
+                                      required></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i> Submit Complaint
+                            </button>
+                            <a href="{% url 'patient_dashboard' %}" class="btn btn-light rounded-pill px-4">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

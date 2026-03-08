@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4 bg-light min-vh-100">
+    <div class="container">
+        <div id="call-ui-header" class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-4 shadow-sm border-bottom border-primary border-3">
+            <div>
+                <h2 class="fw-bold mb-0 text-primary">
+                    <i class="bi bi-camera-video-fill me-2"></i>Live Session
+                </h2>
+                <p class="text-muted mb-0 small">
+                    {% if user == session.therapist %}
+                        Secure Connection with Patient: <strong>{{ session.patient.username }}</strong>
+                    {% else %}
+                        Secure Connection with Dr. <strong>{{ session.therapist.username }}</strong>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="text-center px-4 border-start border-end">
+                <div class="text-uppercase small fw-bold text-muted">Time Remaining</div>
+                <div id="session-timer" class="h4 fw-bold mb-0 text-danger">45:00</div>
+            </div>
+
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-danger rounded-pill px-4 fw-bold" onclick="return confirm('Vro, are you sure you want to leave the call?')">
+                <i class="bi bi-telephone-x-fill me-2"></i> Exit
+            </a>
+        </div>
+
+        <div id="video-frame-card" class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div id="meet" style="height: 75vh; background: #000;"></div>
+        </div>
+
+        <div id="post-call-ui" class="d-none text-center py-5 bg-white rounded-4 shadow-lg">
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                <h2 class="fw-bold mt-3">Call Ended Successfully</h2>
+                <p class="text-muted">The secure session has been disconnected.</p>
+            </div>
+
+            {% if user == session.therapist %}
+                <h5 class="mb-3">Would you like to finalize this session?</h5>
+                <a href="{% url 'update_session' session.id 'completed' %}" class="btn btn-primary btn-lg rounded-pill px-5">
+                    Mark as Completed
+                </a>
+            {% else %}
+                <p>Redirecting you back to your dashboard...</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src='https://meet.ffmuc.net/external_api.js'></script>
+<script>
+    const domain = 'meet.ffmuc.net';
+    const options = {
+        roomName: '{{ room_name }}',
+        width: '100%',
+        height: '100%',
+        parentNode: document.querySelector('#meet'),
+        userInfo: { displayName: '{{ user_display_name }}' },
+        configOverwrite: {
+            prejoinPageEnabled: false,      
+            disableInviteFunctions: true,   
+            // Muted by default to avoid hardware conflicts on a single machine
+            startWithAudioMuted: true,      
+            startWithVideoMuted: true,      
+            enableLobby: false,             
+            disableLobby: true,            
+            requireDisplayName: true,
+            enableNoisyDetection: false,
+        },
+        interfaceConfigOverwrite: {
+            TOOLBAR_BUTTONS: ['microphone', 'camera', 'chat', 'tileview', 'hangup', 'settings'],
+            SHOW_JITSI_WATERMARK: false,
+            RECENT_LIST_ENABLED: false,
+        }
+    };
+
+    const api = new JitsiMeetExternalAPI(domain, options);
+
+    // Timer Logic
+    let timeLeft = 45 * 60; 
+    const timerElement = document.getElementById('session-timer');
+    const countdown = setInterval(() => {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        timerElement.innerHTML = `${minutes}:${seconds}`;
+        if (timeLeft <= 0) { 
+            clearInterval(countdown);
+            alert("Session time has ended.");
+        }
+        timeLeft--;
+    }, 1000);
+
+    // Smart Redirect
+    api.addEventListener('videoConferenceLeft', () => {
+        clearInterval(countdown);
+        document.getElementById('video-frame-card').classList.add('d-none');
+        document.getElementById('call-ui-header').classList.add('d-none');
+        document.getElementById('post-call-ui').classList.remove('d-none');
+        
+        // Redirect patients automatically after 3 seconds
+        {% if user != session.therapist %}
+            setTimeout(() => { window.location.href = "{% url 'dashboard' %}"; }, 3000);
+        {% endif %}
+    });
+</script>
+
+<style>
+    #meet iframe { border-radius: 1rem; border: none; }
+    #session-timer { font-family: 'Courier New', monospace; letter-spacing: 1px; }
+    .bg-light { background-color: #f8f9fa !important; }
+    /* Ensure the video frame looks sharp */
+    #video-frame-card { background-color: #000; min-height: 500px; }
+</style>
+{% endblock %}

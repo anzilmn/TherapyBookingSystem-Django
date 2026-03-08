@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            
+            <div class="text-center mb-4">
+                <div class="display-6 text-warning mb-3">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <h2 class="fw-bold">Session Feedback</h2>
+                <p class="text-muted">Your feedback helps us maintain high-quality care with Dr. {{ session.therapist.username }}</p>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-warning py-2"></div> <div class="card-body p-4 p-lg-5">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase ls-1">How would you rate the session?</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 text-warning">
+                                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                                </span>
+                                <select name="rating" class="form-select bg-light border-0 py-3" required>
+                                    <option value="" disabled selected>Choose a rating...</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                                    <option value="4">⭐⭐⭐⭐ Very Good</option>
+                                    <option value="3">⭐⭐⭐ Average</option>
+                                    <option value="2">⭐⭐ Poor</option>
+                                    <option value="1">⭐ Terrible</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase ls-1">Tell us more</label>
+                            <textarea name="comment" class="form-control bg-light border-0 p-3" rows="5" 
+                                placeholder="Describe your experience... (e.g., Was the therapist helpful? Was the communication clear?)" required></textarea>
+                        </div>
+
+                        <div class="bg-light rounded-3 p-3 mb-4 small text-muted">
+                            <i class="bi bi-shield-lock-fill me-1 text-primary"></i> 
+                            Your review helps other patients, but specific medical details remain private.
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg w-100 rounded-pill py-3 fw-bold shadow-sm text-dark">
+                            Submit Anonymous Review
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'patient_dashboard' %}" class="btn btn-link text-decoration-none text-muted small">
+                    Skip for now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 0.8px; }
+    .form-select:focus, .form-control:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.15);
+        border: 1px solid #ffc107 !important;
+    }
+    .input-group-text {
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}

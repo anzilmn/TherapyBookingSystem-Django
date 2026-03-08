@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-4 no-print">
+        <button onclick="window.print()" class="btn btn-dark rounded-pill px-4 shadow">
+            <i class="bi bi-printer me-2"></i> Print / Save as PDF
+        </button>
+    </div>
+
+    <div class="card border-0 shadow rounded-0 mx-auto" style="max-width: 800px; min-height: 1000px; background: white;">
+        <div class="card-body p-5">
+            <div class="d-flex justify-content-between align-items-center border-bottom border-3 border-primary pb-4 mb-5">
+                <div>
+                    <h1 class="fw-bold text-primary mb-0">MindCare Clinic</h1>
+                    <p class="text-muted mb-0">Digital Mental Health Wellness Center</p>
+                </div>
+                <div class="text-end">
+                    <h5 class="fw-bold mb-0">Dr. {{ prescription.session.therapist.username }}</h5>
+                    <p class="small text-muted mb-0">{{ prescription.session.therapist.therapist_info.specialization }}</p>
+                </div>
+            </div>
+
+            <div class="row mb-5 bg-light p-3 m-0 rounded-3">
+                <div class="col-6">
+                    <small class="text-uppercase text-muted fw-bold d-block">Patient Name</small>
+                    <span class="fw-bold fs-5">{{ prescription.session.patient.username }}</span>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-uppercase text-muted fw-bold d-block">Date of Consultation</small>
+                    <span class="fw-bold fs-5">{{ prescription.session.date }}</span>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Diagnosis / Summary</h6>
+                <p class="ps-2">{{ prescription.diagnosis|linebreaks }}</p>
+            </div>
+
+            <div class="mb-5">
+                <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Therapeutic Advice</h6>
+                <p class="ps-2">{{ prescription.advice|linebreaks }}</p>
+            </div>
+
+            {% if prescription.medicines %}
+            <div class="mb-5">
+                <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Suggested Medication</h6>
+                <p class="ps-2">{{ prescription.medicines|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            <div class="mt-auto pt-5">
+                <div class="row align-items-end">
+                    <div class="col-8">
+                        <small class="text-muted">This is an electronically generated prescription and does not require a physical signature. Confidentiality is protected under MindCare Privacy Policy.</small>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="border-top pt-2">
+                            <p class="fw-bold mb-0">Authorized Signatory</p>
+                            <small class="text-muted">MindCare Telehealth</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .no-print, .navbar, footer { display: none !important; }
+        body { background: white !important; }
+        .card { box-shadow: none !important; border: none !important; }
+        .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    }
+    body { background-color: #e9ecef; }
+</style>
+{% endblock %}

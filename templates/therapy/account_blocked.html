@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-center">
+                    <!-- Red banner top -->
+                    <div style="background: linear-gradient(135deg, #dc3545, #c0392b); height: 8px;"></div>
+
+                    <div class="card-body px-5 py-5">
+                        <!-- Icon -->
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 border border-danger border-opacity-25"
+                             style="width:90px;height:90px;">
+                            <i class="bi bi-slash-circle-fill text-danger" style="font-size:2.5rem;"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark mb-1">Account Suspended</h4>
+                        <p class="text-muted small mb-4">Your therapist account has been blocked by an administrator.</p>
+
+                        <!-- Reason box -->
+                        <div class="rounded-3 p-3 mb-4 text-start" style="background:#fff3f3; border:1px solid #f5c6cb;">
+                            <p class="mb-1 small fw-semibold text-danger"><i class="bi bi-info-circle me-1"></i> Reason for block:</p>
+                            <p class="mb-0 small text-dark">{{ block_reason }}</p>
+                        </div>
+
+                        <p class="text-muted" style="font-size:0.8rem;">
+                            If you believe this is a mistake, please contact our support team at
+                            <a href="mailto:support@therapyapp.com" class="text-danger fw-semibold">support@therapyapp.com</a>
+                        </p>
+
+                        <hr class="my-3 opacity-25">
+
+                        <a href="{% url 'logout' %}" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
